@@ -28,15 +28,15 @@ function draw() {
   fill(255);
   translate(mouseX, mouseY);
   rotate(r);
-  rect(0, 0, 20, 20);
-  r = r + 0.05;
+  rect(0, 0, 40, 40);
+  r = r + 0.02;
   
-  ellipse(thex, they, 10, 10);
+  ellipse(thex, they, 50, 50);
   thex = thex+v*cos(t);
   they = they+v*sin(t);
   
   if(thex>width) t = PI - t;
-  if(thex<0) t = PI -t;
+  if(thex<0) t = PI - t;
   if(they>height) t = TWO_PI - t;
   if(they<0) t = TWO_PI - t;
 }
