@@ -23,7 +23,7 @@
 var x, y; // the current position of the turtle
 //var currentangle = ;
 var currentangle = 0; // which way the turtle is pointing
-var step = 5; // how much the turtle moves with each 'F'
+var step = 15; // how much the turtle moves with each 'F'
 //var angle = 55;
 var angle = 25; // how much the turtle turns with a '-' or '+'
 
@@ -107,6 +107,11 @@ function drawIt(k)
     // update the turtle's position:
     x = x1;
     y = y1;
+    
+    if(x>width) x = 0;
+    if(x<0) x = width;
+    if(y>height) y = 0;
+    if(y<0) y = height;
   }
   else if(k=='+')
   {
@@ -118,13 +123,21 @@ function drawIt(k)
   }
   else if(k=='[')
   {
-    
-    pop(); // go down one level
+    //push();
+    //rotate(currentangle+=angle);
+    saveX = x;
+    saveY = y;
+    saveAngle = currentangle;
     
   }
   else if(k==']')
   {
-    pop();
+    //pop();
+    //rotate(currentangle-=angle);
+    x = saveX;
+    y = saveY;
+    //saveAngle = -currentangle;
+    currentangle = saveAngle;
     
   }
    

@@ -1,39 +1,24 @@
-// L-SYSTEMS:
-// https://en.wikipedia.org/wiki/L-system
-//
-// this p5 sketch takes the turtle we created in the last
-// project and *automates* the drawing based on a Lindenmayer
-// (or L-) system.  L-systems are often used in procedural
-// graphics to make natural, geometric, or interesting 'fractal-style'
-// patterns.
-//
-// your tasks:
-// (1) take a look at the L-system implemented here, and see if you 
-// can expand upon it to do some automatic, cool, geometric drawing.
-// use the turtle that you retooled from the previous sketch as the
-// drawing engine.
-// hint: google L-systems.  there are lots of them out there.
-// another hint: you can use non-drawing symbols as symbolic 
-// placeholders to create really complex patterns.
-
 // TURTLE STUFF:
 var x, y; // the current position of the turtle
-//var currentangle = ;
-var currentangle = 15; // which way the turtle is pointing
-var step = 15; // how much the turtle moves with each 'F'
-var angle = 55;
-//var angle = 90; // how much the turtle turns with a '-' or '+'
+var saveX, saveY, saveAngle;
+var currentangle = 0; // which way the turtle is pointing
+var step = 13; // how much the turtle moves with each 'F'
+var angle = 27;
+//var angle = 30;
 
 // LINDENMAYER STUFF (L-SYSTEMS)
-var thestring = 'FX';
+var thestring = 'F';
 //var thestring = 'A'; // "axiom" or start of the string
 var numloops = 5; // how many iterations of the L-system to pre-compute
 var therules = []; // array for rules
-therules[0] = ['F', 'C0FF-[C1-F+F] + [C2+F-F]'];
+therules[0] = ['F','C0FF[C1-F++F][C2+F--F]C3++F--F'];
+//therules[0] = ['F', 'C0FFFF++++FF-C1-FFFFFF+F+[C2+FFFFFFF-F]]]'];
 //therules[0] = ['A', '-BF+AFA+FB-']; // first rule
-therules[1] = ['X', 'C0FF+[C1+F] + [C3-F]'];
-//therules[1] = ['B', '+AF-BFB-FA+']; // second rule
+//therules[1] = ['Y','-FX-Y'];
+//therules[1] = ['X', 'C0FFFFFF-[C2[X]+C3X]+FFFC1F[C3+FX]-XF'];
+//therules[1] = ['X', '+[F-[F]-FF+']; // second rule
 
+//var thestring = '+F-+[F-F+-[F-+F]F-F-+[+F+-F]-+F+]';
 
 var whereinstring = 0; // where in the L-system are we drawing right now?
 
@@ -41,18 +26,17 @@ var whereinstring = 0; // where in the L-system are we drawing right now?
 function setup()
 {
   createCanvas(800, 600); // this is the size of the window
-  background(255); // background to white
-  stroke(0, 0, 0, 255); // draw in black
+  background(0,0,0,255); // background to white
+  stroke(255); // draw in black
   
-  // start the x and y position at lower-left corner
-  x = 0;
-  y = height-1;
+  x = width/2;
+  y = height/2;
   
   // COMPUTE THE L-SYSTEM
   for(var i = 0;i<numloops;i++) {
-    thestring = lindenmayer(thestring); // do the stuff to make the string
+   thestring = lindenmayer(thestring); // do the stuff to make the string
   }
-  console.log(thestring); // comment this out if it's slowing you down
+  //console.log(thestring); // comment this out if it's slowing you down
   
 }
 
@@ -67,10 +51,15 @@ function draw()
   // wrap around at the end.
   whereinstring++;
   if(whereinstring>thestring.length-1) whereinstring = 0;
+  
+
 
 }
 
-// interpret an L-system
+
+
+// this is a custom function that draws turtle commands
+
 function lindenmayer(s)
 {
   var outputstring = ''; // start a blank output string
@@ -98,44 +87,71 @@ function lindenmayer(s)
 }
 
 // this is a custom function that draws turtle commands
+
 function drawIt(k)
 {
-  if(k=='F') // draw forward
-  {
+  //for (var i = 0; i < this.todo.length; i++)
+  push();  
+    //{
+    if(k=='F') // draw forward
+    {
+    //translate(width/2, height);
+    //stroke(255);
+    //line(0,0,len,0);
+   // translate(len,0);
+    
     // polar to cartesian transformation based on step and currentangle:
     var x1 = x + step*cos(radians(currentangle));
     var y1 = y + step*sin(radians(currentangle));
-    line(x, y, x1, y1); // connect the old and the new
+    //line(0, 0, step*cos(radians(currentangle)), step*sin(radians(currentangle))); // connect the old and the new
+    line(x,y,x1,y1);
+    //translate(angle,0);
     // update the turtle's position:
     x = x1;
     y = y1;
+    
+    if(x>width) x = 0;
+    if(x<0) x = width;
+    if(y>height) y = 0;
+    if(y<0) y = height;
+    
   }
+  
+  //push();
+  //translate(0, y);
+  
   else if(k=='+')
   {
-   currentangle+=angle; // turn left
+   rotate(currentangle+=angle);
+   //currentangle+=angle; // turn left
+   
   }
   else if(k=='-')
   {
-   currentangle-=angle; // turn right   
+   rotate(currentangle-=angle);
+   //currentangle-=angle; // turn right 
+   
+  }
+  else if(k=='[')
+  {
+    //push();
+    //rotate(currentangle+=angle);
+    saveX = x;
+    saveY = y;
+    saveAngle = currentangle;
+    
+  }
+  else if(k==']')
+  {
+    //pop();
+    //rotate(currentangle-=angle);
+    x = saveX;
+    y = saveY;
+    //saveAngle = -currentangle;
+    currentangle = saveAngle;
+    
   }
    
-  // DRAW EVERYTHING:
-
-  // give me some random color values:
-  //var r = random(128, 255);
- // var g = random(0, 192);
-  //var b = random(0, 50);
-  //var a = random(50, 100);
-
-  // pick a gaussian (D&D) distribution for the radius:
-  var radius = 0;
-  radius+= random(0, 15);
-  radius+= random(0, 15);
-  radius+= random(0, 15);
-  radius = radius/3;
+//pop();
   
-  // draw the stuff:
-  fill(48, 132, 245, alpha); // interior fill color
-  ellipse(x, y, radius, radius); // circle that chases the mouse
-
 }
